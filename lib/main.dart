@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'app/app.dart';
+
 void main() {
   runApp(
-    const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: Text('Life OS'),
-        ),
-      ),
-    ),
+    const LifeOSApp(),
   );
 }
