@@ -1,5 +1,4 @@
 enum MissionStatus {
-
   pending,
 
   scheduled,

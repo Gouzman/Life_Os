@@ -1,14 +1,1 @@
-enum PreferredPeriod {
-
-  dawn,
-
-  morning,
-
-  afternoon,
-
-  evening,
-
-  night,
-
-  anytime,
-}
+enum PreferredPeriod { dawn, morning, afternoon, evening, night, anytime }

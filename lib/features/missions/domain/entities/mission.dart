@@ -2,7 +2,6 @@ import 'mission_status.dart';
 import 'preferred_period.dart';
 
 class Mission {
-
   final String id;
 
   final String title;
@@ -34,7 +33,6 @@ class Mission {
   final DateTime? completedAt;
 
   const Mission({
-
     required this.id,
 
     required this.title,
@@ -67,20 +65,13 @@ class Mission {
   });
 
   double get priorityScore {
-
-    return
-
-      (importance * 4) +
-
-      (urgency * 3) +
-
-      (xpReward * 0.2) -
-
-      (duration.inMinutes * 0.1);
+    return (importance * 4) +
+        (urgency * 3) +
+        (xpReward * 0.2) -
+        (duration.inMinutes * 0.1);
   }
 
   Mission copyWith({
-
     String? id,
 
     String? title,
@@ -110,11 +101,8 @@ class Mission {
     DateTime? scheduledEnd,
 
     DateTime? completedAt,
-
   }) {
-
     return Mission(
-
       id: id ?? this.id,
 
       title: title ?? this.title,

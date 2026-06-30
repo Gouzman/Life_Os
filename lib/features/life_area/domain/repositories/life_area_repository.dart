@@ -1,7 +1,6 @@
 import '../entities/life_area.dart';
 
 abstract class LifeAreaRepository {
-
   Future<List<LifeArea>> getAll();
 
   Future<void> create(LifeArea area);
