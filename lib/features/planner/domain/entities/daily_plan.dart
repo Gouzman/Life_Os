@@ -14,12 +14,17 @@ class DailyPlan {
   /// Overall quality score for the generated day from 0 to 100.
   final int dayScore;
 
+  /// Mission template identifiers that could not fit in the day.
+  final List<String> unscheduledTemplateIds;
+
   DailyPlan({
     required this.date,
     required List<MissionInstance> missionInstances,
     required this.remainingFreeTime,
     required this.dayScore,
+    List<String> unscheduledTemplateIds = const [],
   }) : missionInstances = List.unmodifiable(missionInstances),
+       unscheduledTemplateIds = List.unmodifiable(unscheduledTemplateIds),
        assert(
          !remainingFreeTime.isNegative,
          'remainingFreeTime must be positive or zero',

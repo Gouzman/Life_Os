@@ -33,6 +33,9 @@ class MissionTemplate {
   /// Identifier of the life area this mission contributes to.
   final String lifeAreaId;
 
+  /// Whether the planner should treat this mission as non-negotiable.
+  final bool critical;
+
   MissionTemplate({
     required this.id,
     required this.title,
@@ -44,6 +47,7 @@ class MissionTemplate {
     required this.urgency,
     required this.preferredPeriod,
     required this.lifeAreaId,
+    this.critical = false,
   }) : assert(!duration.isNegative, 'duration must be positive or zero'),
        assert(xpReward >= 0, 'xpReward must be positive or zero'),
        assert(
