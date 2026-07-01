@@ -1,12 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:life_os/core/domain/value_objects/energy_level.dart';
+import 'package:life_os/features/missions/domain/entities/mission_instance.dart';
+import 'package:life_os/features/missions/domain/entities/mission_template.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_card.dart';
 
+/// Displays the current priority mission with its key metadata.
+///
+/// Receives its data from the Dashboard provider layer – it contains no
+/// business logic of its own.
 class HeroMissionCard extends StatelessWidget {
-  const HeroMissionCard({super.key});
+  final MissionInstance mission;
+  final MissionTemplate template;
+  final String lifeAreaName;
+
+  const HeroMissionCard({
+    super.key,
+    required this.mission,
+    required this.template,
+    required this.lifeAreaName,
+  });
+
+  String _formatDuration(Duration d) {
+    if (d.inMinutes < 60) return '${d.inMinutes} min';
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    return m == 0 ? '${h}h' : '${h}h ${m}min';
+  }
+
+  String _energyLabel(EnergyLevel level) {
+    switch (level) {
+      case EnergyLevel.low:
+        return 'Energie basse';
+      case EnergyLevel.medium:
+        return 'Energie moyenne';
+      case EnergyLevel.high:
+        return 'Energie haute';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,20 +55,24 @@ class HeroMissionCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               _StatusPill(
-                icon: Icons.flag_outlined,
-                label: 'Mission prioritaire',
-                color: AppColors.accent,
+                icon: template.critical ? Icons.flag : Icons.flag_outlined,
+                label: template.critical
+                    ? 'Mission prioritaire'
+                    : 'Mission planifiee',
+                color: template.critical
+                    ? AppColors.accent
+                    : AppColors.textSecondary,
               ),
               _StatusPill(
-                icon: Icons.business_center_outlined,
-                label: 'Business',
+                icon: Icons.category_outlined,
+                label: lifeAreaName,
                 color: AppColors.textSecondary,
               ),
             ],
           ),
           const Gap(AppSpacing.lg),
           Text(
-            'Developper Life OS',
+            template.title,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w800,
@@ -41,30 +80,37 @@ class HeroMissionCard extends StatelessWidget {
           ),
           const Gap(AppSpacing.sm),
           Text(
-            'Architecture du moteur de planification en Dart pur.',
+            template.description,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.textSecondary,
               height: 1.4,
             ),
           ),
           const Gap(AppSpacing.lg),
-          const Wrap(
+          Wrap(
             spacing: AppSpacing.md,
             runSpacing: AppSpacing.sm,
             children: [
-              _MissionMeta(icon: Icons.schedule, label: '2 h'),
+              _MissionMeta(
+                icon: Icons.schedule,
+                label: _formatDuration(template.duration),
+              ),
               _MissionMeta(
                 icon: Icons.battery_charging_full,
-                label: 'Energie haute',
+                label: _energyLabel(template.energyLevel),
               ),
-              _MissionMeta(icon: Icons.stars_outlined, label: '+80 XP'),
+              _MissionMeta(
+                icon: Icons.stars_outlined,
+                label: '+${template.xpReward} XP',
+              ),
             ],
           ),
           const Gap(AppSpacing.lg),
           FilledButton.icon(
-            onPressed: () {},
+            onPressed: () =>
+                context.push('/today', extra: {'missionId': mission.id}),
             icon: const Icon(Icons.play_arrow),
-            label: const Text('Demarrer la mission'),
+            label: const Text('Voir la mission'),
           ),
         ],
       ),
