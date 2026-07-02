@@ -7,7 +7,7 @@ import 'package:life_os/features/missions/domain/usecases/skip_mission.dart';
 import 'package:life_os/features/missions/domain/usecases/start_mission.dart';
 
 void main() {
-  final _base = MissionInstance(
+  final base = MissionInstance(
     id: 'test-id',
     templateId: 'mt_deep_work',
     scheduledStart: DateTime(2026, 7, 1, 9),
@@ -18,16 +18,16 @@ void main() {
     const useCase = StartMission();
 
     test('transitions status to inProgress', () {
-      final result = useCase(_base);
+      final result = useCase(base);
       expect(result.status, MissionStatus.inProgress);
     });
 
     test('preserves identity fields', () {
-      final result = useCase(_base);
-      expect(result.id, _base.id);
-      expect(result.templateId, _base.templateId);
-      expect(result.scheduledStart, _base.scheduledStart);
-      expect(result.scheduledEnd, _base.scheduledEnd);
+      final result = useCase(base);
+      expect(result.id, base.id);
+      expect(result.templateId, base.templateId);
+      expect(result.scheduledStart, base.scheduledStart);
+      expect(result.scheduledEnd, base.scheduledEnd);
     });
   });
 
@@ -35,13 +35,13 @@ void main() {
     const useCase = CompleteMission();
 
     test('transitions status to completed', () {
-      final result = useCase(_base);
+      final result = useCase(base);
       expect(result.status, MissionStatus.completed);
     });
 
     test('records completedAt', () {
       final before = DateTime.now();
-      final result = useCase(_base);
+      final result = useCase(base);
       final after = DateTime.now();
 
       expect(result.completedAt, isNotNull);
@@ -62,7 +62,7 @@ void main() {
     const useCase = SkipMission();
 
     test('transitions status to skipped', () {
-      final result = useCase(_base);
+      final result = useCase(base);
       expect(result.status, MissionStatus.skipped);
     });
   });
@@ -71,14 +71,14 @@ void main() {
     const useCase = AbandonMission();
 
     test('transitions status to cancelled', () {
-      final result = useCase(_base);
+      final result = useCase(base);
       expect(result.status, MissionStatus.cancelled);
     });
   });
 
   group('Mission lifecycle', () {
     test('full lifecycle: scheduled -> inProgress -> completed', () {
-      var mission = _base;
+      var mission = base;
       expect(mission.status, MissionStatus.scheduled);
 
       mission = const StartMission()(mission);
@@ -90,7 +90,7 @@ void main() {
     });
 
     test('scheduled -> inProgress -> skipped', () {
-      var mission = const StartMission()(_base);
+      var mission = const StartMission()(base);
       mission = const SkipMission()(mission);
       expect(mission.status, MissionStatus.skipped);
     });

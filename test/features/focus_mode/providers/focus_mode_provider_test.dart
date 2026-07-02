@@ -4,10 +4,10 @@ import 'package:life_os/features/focus_mode/presentation/providers/focus_mode_pr
 
 void main() {
   group('FocusModeNotifier', () {
-    ProviderContainer _makeContainer() => ProviderContainer();
+    ProviderContainer makeContainer() => ProviderContainer();
 
     test('initial state is idle', () {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final state = container.read(focusModeProvider);
@@ -18,7 +18,7 @@ void main() {
     });
 
     test('start sets missionId and isRunning', () {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       container.read(focusModeProvider.notifier).start('m1');
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('pause stops isRunning without clearing missionId', () {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       container.read(focusModeProvider.notifier).start('m1');
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('resume restarts timer', () {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       container.read(focusModeProvider.notifier).start('m1');
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('reset clears all state', () {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       container.read(focusModeProvider.notifier).start('m1');
@@ -79,7 +79,7 @@ void main() {
     });
 
     test('resume does nothing when no missionId is set', () {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       // Should not throw

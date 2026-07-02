@@ -8,9 +8,9 @@ Widget _wrapWithProviders(Widget child) {
   final router = GoRouter(
     initialLocation: '/',
     routes: [
-      GoRoute(path: '/', builder: (_, __) => child),
-      GoRoute(path: '/focus-mode', builder: (_, __) => const Scaffold()),
-      GoRoute(path: '/daily-summary', builder: (_, __) => const Scaffold()),
+      GoRoute(path: '/', builder: (_, _) => child),
+      GoRoute(path: '/focus-mode', builder: (_, _) => const Scaffold()),
+      GoRoute(path: '/daily-summary', builder: (_, _) => const Scaffold()),
     ],
   );
   return ProviderScope(child: MaterialApp.router(routerConfig: router));

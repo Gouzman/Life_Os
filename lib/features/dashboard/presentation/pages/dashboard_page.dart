@@ -9,7 +9,7 @@ import 'package:life_os/features/dashboard/presentation/widgets/life_score_card.
 import 'package:life_os/features/planner/presentation/providers/planner_providers.dart';
 
 class DashboardPage extends ConsumerWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+  const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

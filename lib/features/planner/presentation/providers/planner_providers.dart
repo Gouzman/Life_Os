@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:life_os/core/data/seed_data.dart';
 import 'package:life_os/features/missions/data/in_memory_mission_instance_repository.dart';
 import 'package:life_os/features/missions/data/in_memory_mission_template_repository.dart';
@@ -16,7 +16,7 @@ import 'package:life_os/features/planner/domain/entities/planner_input.dart';
 import 'package:life_os/features/planner/domain/repositories/daily_plan_repository.dart';
 import 'package:life_os/features/planner/domain/usecases/generate_daily_plan.dart';
 
-// ── Repository providers ──────────────────────────────────────────────────
+// â”€â”€ Repository providers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Provides the singleton in-memory [DailyPlanRepository].
 final dailyPlanRepositoryProvider = Provider<DailyPlanRepository>(
@@ -34,7 +34,7 @@ final missionTemplateRepositoryProvider = Provider<MissionTemplateRepository>(
   (ref) => InMemoryMissionTemplateRepository(SeedData.missionTemplates),
 );
 
-// ── Template lookup ───────────────────────────────────────────────────────
+// â”€â”€ Template lookup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Provides the full list of mission templates.
 final missionTemplatesProvider = FutureProvider<List<MissionTemplate>>((
@@ -43,7 +43,7 @@ final missionTemplatesProvider = FutureProvider<List<MissionTemplate>>((
   return ref.watch(missionTemplateRepositoryProvider).getAll();
 });
 
-// ── DailyPlan state ───────────────────────────────────────────────────────
+// â”€â”€ DailyPlan state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Manages the [DailyPlan] for today.  Exposes methods to transition mission
 /// statuses without containing any business logic.
@@ -51,29 +51,29 @@ class DailyPlanNotifier extends AsyncNotifier<DailyPlan> {
   @override
   Future<DailyPlan> build() => _loadOrGenerate(DateTime.now());
 
-  // ── Public methods ──────────────────────────────────────────────────────
+  // â”€â”€ Public methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Transitions [missionId] to [MissionStatus.inProgress].
   Future<void> startMission(String missionId) async {
-    await _applyTransition(missionId, const StartMission());
+    await _applyTransition(missionId, const StartMission().call);
   }
 
   /// Transitions [missionId] to [MissionStatus.completed].
   Future<void> completeMission(String missionId) async {
-    await _applyTransition(missionId, const CompleteMission());
+    await _applyTransition(missionId, const CompleteMission().call);
   }
 
   /// Transitions [missionId] to [MissionStatus.skipped].
   Future<void> skipMission(String missionId) async {
-    await _applyTransition(missionId, const SkipMission());
+    await _applyTransition(missionId, const SkipMission().call);
   }
 
   /// Transitions [missionId] to [MissionStatus.cancelled].
   Future<void> abandonMission(String missionId) async {
-    await _applyTransition(missionId, const AbandonMission());
+    await _applyTransition(missionId, const AbandonMission().call);
   }
 
-  // ── Private helpers ─────────────────────────────────────────────────────
+  // â”€â”€ Private helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Future<DailyPlan> _loadOrGenerate(DateTime date) async {
     final repo = ref.read(dailyPlanRepositoryProvider);
@@ -110,7 +110,7 @@ class DailyPlanNotifier extends AsyncNotifier<DailyPlan> {
       final plan = await _loadOrGenerate(today);
       state = AsyncData(plan);
     }
-    
+
     final currentPlan = state.requireValue;
     final instance = currentPlan.missionInstances.firstWhere(
       (m) => m.id == missionId,

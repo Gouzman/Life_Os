@@ -5,13 +5,13 @@ import 'package:life_os/features/missions/domain/entities/mission_status.dart';
 import 'package:life_os/features/planner/presentation/providers/planner_providers.dart';
 
 void main() {
-  ProviderContainer _makeContainer() {
+  ProviderContainer makeContainer() {
     return ProviderContainer();
   }
 
   group('DailyPlanNotifier', () {
     test('generates a plan on first access', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final plan = await container.read(dailyPlanProvider.future);
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('startMission transitions status to inProgress', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final plan = await container.read(dailyPlanProvider.future);
@@ -42,7 +42,7 @@ void main() {
     });
 
     test('completeMission transitions status to completed', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final plan = await container.read(dailyPlanProvider.future);
@@ -61,7 +61,7 @@ void main() {
     });
 
     test('skipMission advances the current mission', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final plan = await container.read(dailyPlanProvider.future);
@@ -79,7 +79,7 @@ void main() {
 
   group('currentMissionProvider', () {
     test('returns the first non-completed mission', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       // Ensure plan is loaded
@@ -95,7 +95,7 @@ void main() {
     });
 
     test('advances to next mission after completing the first', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final plan = await container.read(dailyPlanProvider.future);
@@ -111,7 +111,7 @@ void main() {
 
   group('todayProgressProvider', () {
     test('starts at 0.0 when no missions are completed', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       await container.read(dailyPlanProvider.future);
@@ -121,7 +121,7 @@ void main() {
     });
 
     test('increases after completing a mission', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final plan = await container.read(dailyPlanProvider.future);
@@ -136,7 +136,7 @@ void main() {
 
   group('xpTodayProvider', () {
     test('starts at 0 when no missions are completed', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       await container.read(dailyPlanProvider.future);
@@ -146,7 +146,7 @@ void main() {
     });
 
     test('increases after completing a mission', () async {
-      final container = _makeContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       // Wait for templates to load too

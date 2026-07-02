@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:life_os/features/focus_mode/presentation/pages/focus_mode_page.dart';
-import 'package:life_os/features/planner/presentation/providers/planner_providers.dart';
 
 Widget _wrapPage(String missionId) {
   final router = GoRouter(
@@ -11,7 +10,7 @@ Widget _wrapPage(String missionId) {
     routes: [
       GoRoute(
         path: '/',
-        builder: (_, __) => FocusModePage(missionId: missionId),
+        builder: (_, _) => FocusModePage(missionId: missionId),
       ),
     ],
   );

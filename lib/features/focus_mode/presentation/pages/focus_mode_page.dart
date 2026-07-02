@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
@@ -7,14 +7,13 @@ import 'package:life_os/core/domain/value_objects/energy_level.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/data/seed_data.dart';
-import '../../../dashboard/presentation/providers/dashboard_providers.dart';
 import '../../../planner/presentation/providers/planner_providers.dart';
 import '../providers/focus_mode_provider.dart';
 import '../widgets/focus_timer_display.dart';
 
 /// Full-screen Focus Mode.
 ///
-/// Receives [missionId] via GoRouter extras.  Starts the timer automatically,
+/// Receives [missionId] via GoRouter extras. Starts the timer automatically,
 /// and delegates every state transition to the [DailyPlanNotifier] use-case
 /// layer and to the [FocusModeNotifier].
 class FocusModePage extends ConsumerStatefulWidget {
@@ -58,7 +57,7 @@ class _FocusModePageState extends ConsumerState<FocusModePage> {
         backgroundColor: AppColors.surface,
         title: const Text('Abandonner la mission ?'),
         content: const Text(
-          'La mission sera annulee et ne comptera pas dans votre progression.',
+          'La mission sera annulée et ne comptera pas dans votre progression.',
         ),
         actions: [
           TextButton(
@@ -82,8 +81,8 @@ class _FocusModePageState extends ConsumerState<FocusModePage> {
   @override
   Widget build(BuildContext context) {
     final focusState = ref.watch(focusModeProvider);
-    final template = ref.watch(currentMissionTemplateProvider);
     final planAsync = ref.watch(dailyPlanProvider);
+    final templatesAsync = ref.watch(missionTemplatesProvider);
 
     return PopScope(
       canPop: false,
@@ -101,9 +100,9 @@ class _FocusModePageState extends ConsumerState<FocusModePage> {
           title: Text(
             'Focus Mode',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w700,
-            ),
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
           ),
           actions: [
             IconButton(
@@ -116,71 +115,91 @@ class _FocusModePageState extends ConsumerState<FocusModePage> {
         body: SafeArea(
           top: false,
           child: planAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
             error: (e, _) => Center(
               child: Text(
                 'Erreur : $e',
                 style: const TextStyle(color: AppColors.danger),
               ),
             ),
-            data: (_) {
-              if (template == null) {
-                return const Center(child: Text('Mission introuvable.'));
+            data: (plan) {
+              // 1. Récupérer l'instance spécifique
+              final instance = plan.missionInstances.where((m) => m.id == widget.missionId).firstOrNull;
+              
+              if (instance == null) {
+                return const Center(
+                  child: Text(
+                    'Instance de mission introuvable.',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  )
+                );
               }
 
-              final lifeAreaName =
-                  SeedData.lifeAreas
-                      .where((a) => a.id == template.lifeAreaId)
-                      .map((a) => a.name)
-                      .firstOrNull ??
-                  template.lifeAreaId;
+              return templatesAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                error: (e, _) => Center(child: Text('Erreur : $e', style: const TextStyle(color: AppColors.danger))),
+                data: (templates) {
+                  // 2. Récupérer le template parent
+                  final template = templates.where((t) => t.id == instance.templateId).firstOrNull;
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.xl,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Mission info
-                    _MissionBadge(
-                      title: template.title,
-                      lifeArea: lifeAreaName,
-                      xp: template.xpReward,
-                      energyLevel: template.energyLevel,
+                  final title = template?.title ?? 'Mission';
+                  final xpReward = template?.xpReward ?? 10;
+                  final energyLevel = template?.energyLevel ?? EnergyLevel.medium;
+                  // Utilisation de la durée définie dans le template ou calculée depuis l'instance
+                  final plannedDuration = template?.duration ?? instance.scheduledEnd.difference(instance.scheduledStart);
+                  
+                  final lifeAreaName = template != null 
+                    ? SeedData.lifeAreas.where((a) => a.id == template.lifeAreaId).map((a) => a.name).firstOrNull ?? template.lifeAreaId
+                    : 'ROUTINE';
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.xl,
                     ),
-                    const Spacer(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Mission info
+                        _MissionBadge(
+                          title: title,
+                          lifeArea: lifeAreaName,
+                          xp: xpReward,
+                          energyLevel: energyLevel,
+                        ),
+                        const Spacer(),
 
-                    // Timer
-                    FocusTimerDisplay(
-                      elapsed: focusState.elapsed,
-                      isRunning: focusState.isRunning,
+                        // Timer
+                        FocusTimerDisplay(
+                          elapsed: focusState.elapsed,
+                          isRunning: focusState.isRunning,
+                        ),
+
+                        const Gap(AppSpacing.lg),
+
+                        // Progress within planned duration
+                        _DurationProgress(
+                          elapsed: focusState.elapsed,
+                          planned: plannedDuration,
+                        ),
+
+                        const Spacer(),
+
+                        // Action buttons
+                        _ActionButtons(
+                          isRunning: focusState.isRunning,
+                          onPause: () =>
+                              ref.read(focusModeProvider.notifier).pause(),
+                          onResume: () =>
+                              ref.read(focusModeProvider.notifier).resume(),
+                          onComplete: _onComplete,
+                          onSkip: _onSkip,
+                        ),
+                        const Gap(AppSpacing.xl),
+                      ],
                     ),
-
-                    const Gap(AppSpacing.lg),
-
-                    // Progress within planned duration
-                    _DurationProgress(
-                      elapsed: focusState.elapsed,
-                      planned: template.duration,
-                    ),
-
-                    const Spacer(),
-
-                    // Action buttons
-                    _ActionButtons(
-                      isRunning: focusState.isRunning,
-                      onPause: () =>
-                          ref.read(focusModeProvider.notifier).pause(),
-                      onResume: () =>
-                          ref.read(focusModeProvider.notifier).resume(),
-                      onComplete: _onComplete,
-                      onSkip: _onSkip,
-                    ),
-                    const Gap(AppSpacing.xl),
-                  ],
-                ),
+                  );
+                }
               );
             },
           ),
@@ -190,7 +209,7 @@ class _FocusModePageState extends ConsumerState<FocusModePage> {
   }
 }
 
-// ── Mission badge ─────────────────────────────────────────────────────────
+// ─── Mission badge ──────────────────────────────────────────────────────────
 
 class _MissionBadge extends StatelessWidget {
   final String title;
@@ -212,34 +231,34 @@ class _MissionBadge extends StatelessWidget {
         Text(
           lifeArea.toUpperCase(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: AppColors.accent,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.5,
-          ),
+                color: AppColors.accent,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
+              ),
         ),
         const Gap(AppSpacing.sm),
         Text(
           title,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w800,
-          ),
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
         ),
         const Gap(AppSpacing.sm),
         Text(
           '+$xp XP',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: AppColors.warning,
-            fontWeight: FontWeight.w700,
-          ),
+                color: AppColors.warning,
+                fontWeight: FontWeight.w700,
+              ),
         ),
       ],
     );
   }
 }
 
-// ── Duration progress ─────────────────────────────────────────────────────
+// ─── Duration progress ──────────────────────────────────────────────────────
 
 class _DurationProgress extends StatelessWidget {
   final Duration elapsed;
@@ -264,7 +283,7 @@ class _DurationProgress extends StatelessWidget {
         ),
         const Gap(AppSpacing.sm),
         Text(
-          '${(progress * 100).round()}% de la duree prevue',
+          '${(progress * 100).round()}% de la durée prévue',
           style: Theme.of(
             context,
           ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
@@ -274,7 +293,7 @@ class _DurationProgress extends StatelessWidget {
   }
 }
 
-// ── Action buttons ────────────────────────────────────────────────────────
+// ─── Action buttons ─────────────────────────────────────────────────────────
 
 class _ActionButtons extends StatelessWidget {
   final bool isRunning;
