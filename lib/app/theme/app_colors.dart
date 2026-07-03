@@ -1,21 +1,29 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class AppColors {
   const AppColors._();
 
-  static const Color background = Color(0xFF09090B);
-  static const Color surface = Color(0xFF18181B);
-  static const Color surfaceHigh = Color(0xFF242428);
-  static const Color card = Color(0xFF121214);
-  static const Color border = Color(0xFF2F2F35);
+  // Fond très sombre (Bleu nuit profond / Noir)
+  static const Color background = Color(0xFF0B0F19); 
+  static const Color surface = Color(0xFF151B2B); // Cartes sombres
+  static const Color surfaceHigh = Color(0xFF1E293B);
+  static const Color card = Color(0xFF151B2B);
+  static const Color border = Color(0xFF2A344A);
 
-  static const Color primary = Color(0xFFEFEFF1);
-  static const Color accent = Color(0xFF60A5FA);
-  static const Color success = Color(0xFF4ADE80);
-  static const Color warning = Color(0xFFFBBF24);
-  static const Color danger = Color(0xFFF87171);
+  // Bleu dominant
+  static const Color primary = Color(0xFF2563EB); 
+  static const Color primaryLight = Color(0xFF3B82F6); 
+  
+  // Violet secondaire
+  static const Color accent = Color(0xFF7C3AED); 
+  static const Color accentLight = Color(0xFF8B5CF6);
+  
+  static const Color success = Color(0xFF10B981);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color danger = Color(0xFFEF4444);
 
-  static const Color textPrimary = Color(0xFFFAFAFA);
-  static const Color textSecondary = Color(0xFFA1A1AA);
-  static const Color textMuted = Color(0xFF71717A);
+  // Textes clairs pour contraster avec le fond sombre
+  static const Color textPrimary = Color(0xFFF8FAFC); 
+  static const Color textSecondary = Color(0xFF94A3B8); 
+  static const Color textMuted = Color(0xFF64748B); 
 }
