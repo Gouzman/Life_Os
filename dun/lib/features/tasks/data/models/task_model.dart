@@ -1,0 +1,179 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dun/features/tasks/domain/entities/task.dart';
+import 'package:dun/features/tasks/domain/entities/task_status.dart';
+
+class TaskModel {
+  const TaskModel({
+    required this.id,
+    required this.userId,
+    required this.title,
+    this.description,
+    required this.scheduledAt,
+    required this.createdAt,
+    required this.updatedAt,
+    this.startedAt,
+    this.completedAt,
+    this.lastPostponedAt,
+    required this.expectedDurationMinutes,
+    this.actualDurationMinutes,
+    this.postponeCount = 0,
+    this.status = 'pending',
+    this.notes,
+    this.priority = 0,
+    this.archived = false,
+  });
+
+  final String id;
+  final String userId;
+  final String title;
+  final String? description;
+  final DateTime scheduledAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? startedAt;
+  final DateTime? completedAt;
+  final DateTime? lastPostponedAt;
+  final int expectedDurationMinutes;
+  final int? actualDurationMinutes;
+  final int postponeCount;
+  final String status;
+  final String? notes;
+  final int priority;
+  final bool archived;
+
+  factory TaskModel.fromJson(Map<String, dynamic> json) {
+    return TaskModel(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String?,
+      scheduledAt: (json['scheduledAt'] as Timestamp).toDate(),
+      createdAt: (json['createdAt'] as Timestamp).toDate(),
+      updatedAt: (json['updatedAt'] as Timestamp).toDate(),
+      startedAt: (json['startedAt'] as Timestamp?)?.toDate(),
+      completedAt: (json['completedAt'] as Timestamp?)?.toDate(),
+      lastPostponedAt: (json['lastPostponedAt'] as Timestamp?)?.toDate(),
+      expectedDurationMinutes: json['expectedDurationMinutes'] as int,
+      actualDurationMinutes: json['actualDurationMinutes'] as int?,
+      postponeCount: json['postponeCount'] as int? ?? 0,
+      status: json['status'] as String? ?? 'pending',
+      notes: json['notes'] as String?,
+      priority: json['priority'] as int? ?? 0,
+      archived: json['archived'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'title': title,
+      'description': description,
+      'scheduledAt': Timestamp.fromDate(scheduledAt),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': Timestamp.fromDate(updatedAt),
+      'startedAt': startedAt != null ? Timestamp.fromDate(startedAt!) : null,
+      'completedAt': completedAt != null
+          ? Timestamp.fromDate(completedAt!)
+          : null,
+      'lastPostponedAt': lastPostponedAt != null
+          ? Timestamp.fromDate(lastPostponedAt!)
+          : null,
+      'expectedDurationMinutes': expectedDurationMinutes,
+      'actualDurationMinutes': actualDurationMinutes,
+      'postponeCount': postponeCount,
+      'status': status,
+      'notes': notes,
+      'priority': priority,
+      'archived': archived,
+    };
+  }
+
+  Task toEntity() {
+    return Task(
+      id: id,
+      userId: userId,
+      title: title,
+      description: description,
+      scheduledAt: scheduledAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      startedAt: startedAt,
+      completedAt: completedAt,
+      lastPostponedAt: lastPostponedAt,
+      expectedDuration: Duration(minutes: expectedDurationMinutes),
+      actualDuration: actualDurationMinutes != null
+          ? Duration(minutes: actualDurationMinutes!)
+          : null,
+      postponeCount: postponeCount,
+      status: TaskStatus.fromValue(status),
+      notes: notes,
+      priority: priority,
+      archived: archived,
+    );
+  }
+
+  factory TaskModel.fromEntity(Task task) {
+    return TaskModel(
+      id: task.id,
+      userId: task.userId,
+      title: task.title,
+      description: task.description,
+      scheduledAt: task.scheduledAt,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+      startedAt: task.startedAt,
+      completedAt: task.completedAt,
+      lastPostponedAt: task.lastPostponedAt,
+      expectedDurationMinutes: task.expectedDuration.inMinutes,
+      actualDurationMinutes: task.actualDuration?.inMinutes,
+      postponeCount: task.postponeCount,
+      status: task.status.value,
+      notes: task.notes,
+      priority: task.priority,
+      archived: task.archived,
+    );
+  }
+
+  TaskModel copyWith({
+    String? id,
+    String? userId,
+    String? title,
+    String? description,
+    DateTime? scheduledAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? startedAt,
+    DateTime? completedAt,
+    DateTime? lastPostponedAt,
+    int? expectedDurationMinutes,
+    int? actualDurationMinutes,
+    int? postponeCount,
+    String? status,
+    String? notes,
+    int? priority,
+    bool? archived,
+  }) {
+    return TaskModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      startedAt: startedAt ?? this.startedAt,
+      completedAt: completedAt ?? this.completedAt,
+      lastPostponedAt: lastPostponedAt ?? this.lastPostponedAt,
+      expectedDurationMinutes:
+          expectedDurationMinutes ?? this.expectedDurationMinutes,
+      actualDurationMinutes:
+          actualDurationMinutes ?? this.actualDurationMinutes,
+      postponeCount: postponeCount ?? this.postponeCount,
+      status: status ?? this.status,
+      notes: notes ?? this.notes,
+      priority: priority ?? this.priority,
+      archived: archived ?? this.archived,
+    );
+  }
+}

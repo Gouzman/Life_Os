@@ -8,6 +8,8 @@ class RouterPaths {
   static const String dashboard = '/dashboard';
   static const String tasks = '/tasks';
   static const String task = '/tasks/:id';
+  static const String createTask = '/tasks/create';
+  static const String editTask = '/tasks/:id/edit';
   static const String execution = '/execution';
   static const String history = '/history';
   static const String settings = '/settings';

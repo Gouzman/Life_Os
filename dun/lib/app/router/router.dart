@@ -9,6 +9,7 @@ import 'package:dun/features/history/presentation/screens/history_screen.dart';
 import 'package:dun/features/scheduler/presentation/screens/execution_screen.dart';
 import 'package:dun/features/settings/presentation/screens/settings_screen.dart';
 import 'package:dun/features/splash/presentation/screens/splash_screen.dart';
+import 'package:dun/features/tasks/presentation/screens/task_form_screen.dart';
 import 'package:dun/features/tasks/presentation/screens/task_screen.dart';
 import 'package:dun/features/tasks/presentation/screens/tasks_screen.dart';
 import 'package:flutter/material.dart';
@@ -95,6 +96,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return TaskScreen(id: id);
+        },
+      ),
+      GoRoute(
+        path: RouterPaths.createTask,
+        name: 'createTask',
+        builder: (context, state) => const TaskFormScreen(),
+      ),
+      GoRoute(
+        path: RouterPaths.editTask,
+        name: 'editTask',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return TaskFormScreen(taskId: id);
         },
       ),
       GoRoute(

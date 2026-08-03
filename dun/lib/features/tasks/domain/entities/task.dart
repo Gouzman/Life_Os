@@ -12,10 +12,14 @@ class Task extends BaseEntity {
     required this.updatedAt,
     this.startedAt,
     this.completedAt,
+    this.lastPostponedAt,
     required this.expectedDuration,
     this.actualDuration,
     this.postponeCount = 0,
     this.status = TaskStatus.pending,
+    this.notes,
+    this.priority = 0,
+    this.archived = false,
   });
 
   final String id;
@@ -27,10 +31,21 @@ class Task extends BaseEntity {
   final DateTime updatedAt;
   final DateTime? startedAt;
   final DateTime? completedAt;
+  final DateTime? lastPostponedAt;
   final Duration expectedDuration;
   final Duration? actualDuration;
   final int postponeCount;
   final TaskStatus status;
+  final String? notes;
+  final int priority;
+  final bool archived;
+
+  bool get isOverdue =>
+      status != TaskStatus.completed &&
+      status != TaskStatus.cancelled &&
+      scheduledAt.isBefore(DateTime.now());
+
+  bool get canBePostponed => postponeCount < 3;
 
   Task copyWith({
     String? id,
@@ -42,10 +57,14 @@ class Task extends BaseEntity {
     DateTime? updatedAt,
     DateTime? startedAt,
     DateTime? completedAt,
+    DateTime? lastPostponedAt,
     Duration? expectedDuration,
     Duration? actualDuration,
     int? postponeCount,
     TaskStatus? status,
+    String? notes,
+    int? priority,
+    bool? archived,
   }) {
     return Task(
       id: id ?? this.id,
@@ -57,10 +76,14 @@ class Task extends BaseEntity {
       updatedAt: updatedAt ?? this.updatedAt,
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
+      lastPostponedAt: lastPostponedAt ?? this.lastPostponedAt,
       expectedDuration: expectedDuration ?? this.expectedDuration,
       actualDuration: actualDuration ?? this.actualDuration,
       postponeCount: postponeCount ?? this.postponeCount,
       status: status ?? this.status,
+      notes: notes ?? this.notes,
+      priority: priority ?? this.priority,
+      archived: archived ?? this.archived,
     );
   }
 
@@ -75,9 +98,13 @@ class Task extends BaseEntity {
     updatedAt,
     startedAt,
     completedAt,
+    lastPostponedAt,
     expectedDuration,
     actualDuration,
     postponeCount,
     status,
+    notes,
+    priority,
+    archived,
   ];
 }
