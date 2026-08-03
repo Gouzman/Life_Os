@@ -1,6 +1,7 @@
 import 'package:dun/app/providers/auth_state_provider.dart';
 import 'package:dun/app/providers/task_providers.dart';
 import 'package:dun/features/tasks/domain/entities/task.dart';
+import 'package:dun/features/tasks/domain/usecases/watch_tasks_for_day.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 sealed class TaskListState {
@@ -36,9 +37,11 @@ class TaskListController extends Notifier<TaskListState> {
       return const TaskListFailure('Utilisateur non authentifié.');
     }
 
-    final watchTasksForToday = ref.read(watchTasksForTodayProvider);
+    final watchTasksForDay = ref.read(watchTasksForDayProvider);
 
-    watchTasksForToday(user.id).listen(
+    watchTasksForDay(
+      WatchTasksForDayParams(userId: user.id, day: DateTime.now()),
+    ).listen(
       (tasks) => state = TaskListLoaded(tasks),
       onError: (Object e) => state = TaskListFailure(e.toString()),
     );

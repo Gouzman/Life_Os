@@ -47,12 +47,12 @@ class _TaskScreenState extends ConsumerState<TaskScreen> {
     );
   }
 
-  Widget _buildBody(TaskDetailState state) {
+  Widget _buildBody(TaskState state) {
     return switch (state) {
-      TaskDetailInitial() || TaskDetailLoading() => const AppLoader(),
-      TaskDetailFailure(:final message) => Center(child: Text(message)),
-      TaskDetailLoaded(:final task) => _buildDetail(task),
-      TaskDetailSaved() || TaskDetailDeleted() => const AppLoader(),
+      TaskInitial() || TaskLoading() => const AppLoader(),
+      TaskFailure(:final message) => Center(child: Text(message)),
+      TaskLoaded(:final task) => _buildDetail(task),
+      TaskSaved() || TaskDeleted() => const AppLoader(),
     };
   }
 

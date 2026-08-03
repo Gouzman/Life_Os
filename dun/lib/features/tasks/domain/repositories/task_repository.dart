@@ -4,6 +4,10 @@ import 'package:dun/features/tasks/domain/entities/task.dart';
 abstract class TaskRepository {
   Stream<List<Task>> watchTasks(String userId);
 
+  Stream<Task?> watchTask(String taskId);
+
+  Stream<List<Task>> watchPendingTasks(String userId);
+
   Stream<List<Task>> watchTasksForDay(String userId, DateTime day);
 
   Stream<List<Task>> watchTasksByPeriod(

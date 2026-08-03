@@ -9,9 +9,10 @@ import 'package:dun/features/tasks/domain/usecases/create_task.dart';
 import 'package:dun/features/tasks/domain/usecases/delete_task.dart';
 import 'package:dun/features/tasks/domain/usecases/get_task_by_id.dart';
 import 'package:dun/features/tasks/domain/usecases/update_task.dart';
+import 'package:dun/features/tasks/domain/usecases/watch_task.dart';
 import 'package:dun/features/tasks/domain/usecases/watch_tasks.dart';
 import 'package:dun/features/tasks/domain/usecases/watch_tasks_by_period.dart';
-import 'package:dun/features/tasks/domain/usecases/watch_tasks_for_today.dart';
+import 'package:dun/features/tasks/domain/usecases/watch_tasks_for_day.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final taskRemoteDataSourceProvider = Provider<TaskRemoteDataSource>((ref) {
@@ -29,8 +30,12 @@ final watchTasksProvider = Provider<WatchTasks>((ref) {
   return WatchTasks(ref.read(taskRepositoryProvider));
 });
 
-final watchTasksForTodayProvider = Provider<WatchTasksForToday>((ref) {
-  return WatchTasksForToday(ref.read(taskRepositoryProvider));
+final watchTaskProvider = Provider<WatchTask>((ref) {
+  return WatchTask(ref.read(taskRepositoryProvider));
+});
+
+final watchTasksForDayProvider = Provider<WatchTasksForDay>((ref) {
+  return WatchTasksForDay(ref.read(taskRepositoryProvider));
 });
 
 final watchTasksByPeriodProvider = Provider<WatchTasksByPeriod>((ref) {

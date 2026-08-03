@@ -64,17 +64,15 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     );
   }
 
-  Widget _buildBody(TaskDetailState state) {
-    if (state is TaskDetailLoaded && !_isPopulated) {
+  Widget _buildBody(TaskState state) {
+    if (state is TaskLoaded && !_isPopulated) {
       _populateFields(state.task);
     }
 
     return switch (state) {
-      TaskDetailInitial() || TaskDetailLoading() => const AppLoader(),
-      TaskDetailFailure(:final message) => Center(child: Text(message)),
-      TaskDetailLoaded() ||
-      TaskDetailSaved() ||
-      TaskDetailDeleted() => _buildForm(),
+      TaskInitial() || TaskLoading() => const AppLoader(),
+      TaskFailure(:final message) => Center(child: Text(message)),
+      TaskLoaded() || TaskSaved() || TaskDeleted() => _buildForm(),
     };
   }
 
@@ -214,7 +212,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     final now = ref.read(nowProvider)();
     final uuid = ref.read(uuidProvider);
 
-    final existingTask = state is TaskDetailLoaded ? state.task : null;
+    final existingTask = state is TaskLoaded ? state.task : null;
 
     final task = Task(
       id: existingTask?.id ?? uuid.v4(),
@@ -236,9 +234,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
       archived: existingTask?.archived ?? false,
     );
 
-    final result = await ref
-        .read(taskControllerProvider.notifier)
-        .saveTask(task);
+    final result = task.id.isEmpty
+        ? await ref.read(taskControllerProvider.notifier).createTask(task)
+        : await ref.read(taskControllerProvider.notifier).updateTask(task);
 
     if (mounted && result.isSuccess) {
       context.go(RouterPaths.tasks);

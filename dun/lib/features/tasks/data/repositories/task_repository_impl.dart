@@ -25,6 +25,20 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
+  Stream<Task?> watchTask(String taskId) {
+    return _remoteDataSource
+        .watchTask(taskId)
+        .map((model) => model?.toEntity());
+  }
+
+  @override
+  Stream<List<Task>> watchPendingTasks(String userId) {
+    return _remoteDataSource
+        .watchPendingTasks(userId)
+        .map((models) => models.map((m) => m.toEntity()).toList());
+  }
+
+  @override
   Stream<List<Task>> watchTasksForDay(String userId, DateTime day) {
     return _remoteDataSource
         .watchTasksForDay(userId, day)

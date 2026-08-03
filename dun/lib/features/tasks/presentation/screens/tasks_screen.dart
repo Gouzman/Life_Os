@@ -4,6 +4,7 @@ import 'package:dun/core/widgets/app_scaffold.dart';
 import 'package:dun/features/tasks/domain/entities/task.dart';
 import 'package:dun/features/tasks/domain/entities/task_status.dart';
 import 'package:dun/features/tasks/domain/usecases/change_task_status.dart';
+import 'package:dun/features/tasks/domain/usecases/delete_task.dart';
 import 'package:dun/features/tasks/presentation/controllers/task_list_controller.dart';
 import 'package:dun/features/tasks/presentation/providers/task_list_provider.dart';
 import 'package:dun/features/tasks/presentation/widgets/task_list_tile.dart';
@@ -99,6 +100,6 @@ class TasksScreen extends ConsumerWidget {
 
   Future<void> _deleteTask(WidgetRef ref, String taskId) async {
     final useCase = ref.read(deleteTaskProvider);
-    await useCase(taskId);
+    await useCase(DeleteTaskParams(taskId: taskId));
   }
 }
