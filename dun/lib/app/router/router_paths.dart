@@ -3,6 +3,8 @@ class RouterPaths {
 
   static const String splash = '/';
   static const String auth = '/auth';
+  static const String pinSetup = '/pin-setup';
+  static const String pinLogin = '/pin-login';
   static const String dashboard = '/dashboard';
   static const String tasks = '/tasks';
   static const String task = '/tasks/:id';

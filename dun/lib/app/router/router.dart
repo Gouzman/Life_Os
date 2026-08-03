@@ -1,6 +1,9 @@
 import 'package:dun/app/providers/auth_state_provider.dart';
+import 'package:dun/app/providers/global_providers.dart';
 import 'package:dun/app/router/router_paths.dart';
-import 'package:dun/features/auth/presentation/screens/auth_screen.dart';
+import 'package:dun/features/auth/presentation/screens/login_screen.dart';
+import 'package:dun/features/auth/presentation/screens/pin_login_screen.dart';
+import 'package:dun/features/auth/presentation/screens/pin_setup_screen.dart';
 import 'package:dun/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:dun/features/history/presentation/screens/history_screen.dart';
 import 'package:dun/features/scheduler/presentation/screens/execution_screen.dart';
@@ -16,21 +19,39 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
+  final pinService = ref.watch(pinServiceProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: RouterPaths.splash,
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final isSplash = state.matchedLocation == RouterPaths.splash;
       final isAuthRoute = state.matchedLocation == RouterPaths.auth;
+      final isPinSetup = state.matchedLocation == RouterPaths.pinSetup;
+      final isPinLogin = state.matchedLocation == RouterPaths.pinLogin;
 
       return authState.when(
-        data: (isAuthenticated) {
-          if (isSplash) {
-            return isAuthenticated ? RouterPaths.dashboard : RouterPaths.auth;
+        data: (user) async {
+          final isAuthenticated = user != null;
+
+          if (!isAuthenticated) {
+            if (isSplash || isAuthRoute) return null;
+            return RouterPaths.auth;
           }
-          if (isAuthenticated && isAuthRoute) return RouterPaths.dashboard;
-          if (!isAuthenticated && !isAuthRoute) return RouterPaths.auth;
+
+          final hasPin = await pinService.hasPin;
+
+          if (!hasPin) {
+            if (isPinSetup) return null;
+            return RouterPaths.pinSetup;
+          }
+
+          if (isSplash || isAuthRoute || isPinSetup) {
+            if (isPinLogin) return null;
+            return RouterPaths.pinLogin;
+          }
+
+          if (isPinLogin) return RouterPaths.dashboard;
           return null;
         },
         loading: () => isSplash ? null : RouterPaths.splash,
@@ -46,7 +67,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouterPaths.auth,
         name: 'auth',
-        builder: (context, state) => const AuthScreen(),
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: RouterPaths.pinSetup,
+        name: 'pinSetup',
+        builder: (context, state) => const PinSetupScreen(),
+      ),
+      GoRoute(
+        path: RouterPaths.pinLogin,
+        name: 'pinLogin',
+        builder: (context, state) => const PinLoginScreen(),
       ),
       GoRoute(
         path: RouterPaths.dashboard,
