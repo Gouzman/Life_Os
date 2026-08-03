@@ -1,0 +1,19 @@
+{
+  "@@locale": "fr",
+  "appTitle": "Life OS",
+  "@appTitle": {
+    "description": "Titre de l'application"
+  },
+  "welcome": "Bienvenue",
+  "@welcome": {
+    "description": "Message de bienvenue"
+  },
+  "errorUnknown": "Une erreur est survenue.",
+  "@errorUnknown": {
+    "description": "Message d'erreur generique"
+  },
+  "errorNetwork": "Connexion internet indisponible.",
+  "@errorNetwork": {
+    "description": "Message d'erreur reseau"
+  }
+}

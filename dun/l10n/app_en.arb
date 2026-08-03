@@ -1,0 +1,19 @@
+{
+  "@@locale": "en",
+  "appTitle": "Life OS",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "welcome": "Welcome",
+  "@welcome": {
+    "description": "Welcome message"
+  },
+  "errorUnknown": "Something went wrong.",
+  "@errorUnknown": {
+    "description": "Generic error message"
+  },
+  "errorNetwork": "Internet connection unavailable.",
+  "@errorNetwork": {
+    "description": "Network error message"
+  }
+}
