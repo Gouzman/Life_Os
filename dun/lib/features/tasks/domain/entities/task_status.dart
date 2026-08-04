@@ -1,6 +1,7 @@
 enum TaskStatus {
   pending,
   inProgress,
+  paused,
   completed,
   cancelled,
   archived;

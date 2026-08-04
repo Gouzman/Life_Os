@@ -1,6 +1,8 @@
 import 'package:dun/core/domain/base_entity.dart';
 import 'package:dun/features/tasks/domain/entities/task_status.dart';
 
+import '../services/execution_action.dart';
+
 class Task extends BaseEntity {
   const Task({
     required this.id,
@@ -13,6 +15,9 @@ class Task extends BaseEntity {
     this.startedAt,
     this.completedAt,
     this.lastPostponedAt,
+    this.pausedAt,
+    this.pausedDuration = Duration.zero,
+    this.pauseCount = 0,
     required this.expectedDuration,
     this.actualDuration,
     this.postponeCount = 0,
@@ -32,6 +37,9 @@ class Task extends BaseEntity {
   final DateTime? startedAt;
   final DateTime? completedAt;
   final DateTime? lastPostponedAt;
+  final DateTime? pausedAt;
+  final Duration pausedDuration;
+  final int pauseCount;
   final Duration expectedDuration;
   final Duration? actualDuration;
   final int postponeCount;
@@ -47,6 +55,41 @@ class Task extends BaseEntity {
 
   bool get canBePostponed => postponeCount < 3;
 
+  /// Indique si l'action [action] est autorisée depuis le statut courant.
+  bool canExecute(ExecutionAction action) {
+    return switch (action) {
+      ExecutionAction.start =>
+        status == TaskStatus.pending ||
+            status == TaskStatus.inProgress ||
+            status == TaskStatus.paused,
+      ExecutionAction.pause => status == TaskStatus.inProgress,
+      ExecutionAction.resume => status == TaskStatus.paused,
+      ExecutionAction.complete =>
+        status == TaskStatus.inProgress || status == TaskStatus.paused,
+      ExecutionAction.cancel =>
+        status != TaskStatus.completed && status != TaskStatus.cancelled,
+      ExecutionAction.postpone =>
+        canBePostponed &&
+            status != TaskStatus.completed &&
+            status != TaskStatus.cancelled &&
+            status != TaskStatus.archived,
+    };
+  }
+
+  /// Retourne la durée totale écoulée depuis le démarrage, en déduisant le
+  /// temps passé en pause. Retourne `Duration.zero` si la tâche n'a pas
+  /// démarré.
+  Duration get elapsedTime {
+    if (startedAt == null) return Duration.zero;
+    final reference = completedAt ?? DateTime.now();
+    var elapsed = reference.difference(startedAt!);
+    elapsed -= pausedDuration;
+    if (status == TaskStatus.paused && pausedAt != null) {
+      elapsed -= DateTime.now().difference(pausedAt!);
+    }
+    return elapsed < Duration.zero ? Duration.zero : elapsed;
+  }
+
   Task copyWith({
     String? id,
     String? userId,
@@ -58,6 +101,9 @@ class Task extends BaseEntity {
     DateTime? startedAt,
     DateTime? completedAt,
     DateTime? lastPostponedAt,
+    DateTime? pausedAt,
+    Duration? pausedDuration,
+    int? pauseCount,
     Duration? expectedDuration,
     Duration? actualDuration,
     int? postponeCount,
@@ -77,6 +123,9 @@ class Task extends BaseEntity {
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
       lastPostponedAt: lastPostponedAt ?? this.lastPostponedAt,
+      pausedAt: pausedAt ?? this.pausedAt,
+      pausedDuration: pausedDuration ?? this.pausedDuration,
+      pauseCount: pauseCount ?? this.pauseCount,
       expectedDuration: expectedDuration ?? this.expectedDuration,
       actualDuration: actualDuration ?? this.actualDuration,
       postponeCount: postponeCount ?? this.postponeCount,
@@ -99,6 +148,9 @@ class Task extends BaseEntity {
     startedAt,
     completedAt,
     lastPostponedAt,
+    pausedAt,
+    pausedDuration,
+    pauseCount,
     expectedDuration,
     actualDuration,
     postponeCount,

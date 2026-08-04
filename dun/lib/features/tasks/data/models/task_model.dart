@@ -14,6 +14,9 @@ class TaskModel {
     this.startedAt,
     this.completedAt,
     this.lastPostponedAt,
+    this.pausedAt,
+    this.pausedDurationMinutes = 0,
+    this.pauseCount = 0,
     required this.expectedDurationMinutes,
     this.actualDurationMinutes,
     this.postponeCount = 0,
@@ -33,6 +36,9 @@ class TaskModel {
   final DateTime? startedAt;
   final DateTime? completedAt;
   final DateTime? lastPostponedAt;
+  final DateTime? pausedAt;
+  final int pausedDurationMinutes;
+  final int pauseCount;
   final int expectedDurationMinutes;
   final int? actualDurationMinutes;
   final int postponeCount;
@@ -53,6 +59,9 @@ class TaskModel {
       startedAt: (json['startedAt'] as Timestamp?)?.toDate(),
       completedAt: (json['completedAt'] as Timestamp?)?.toDate(),
       lastPostponedAt: (json['lastPostponedAt'] as Timestamp?)?.toDate(),
+      pausedAt: (json['pausedAt'] as Timestamp?)?.toDate(),
+      pausedDurationMinutes: json['pausedDurationMinutes'] as int? ?? 0,
+      pauseCount: json['pauseCount'] as int? ?? 0,
       expectedDurationMinutes: json['expectedDurationMinutes'] as int,
       actualDurationMinutes: json['actualDurationMinutes'] as int?,
       postponeCount: json['postponeCount'] as int? ?? 0,
@@ -79,6 +88,9 @@ class TaskModel {
       'lastPostponedAt': lastPostponedAt != null
           ? Timestamp.fromDate(lastPostponedAt!)
           : null,
+      'pausedAt': pausedAt != null ? Timestamp.fromDate(pausedAt!) : null,
+      'pausedDurationMinutes': pausedDurationMinutes,
+      'pauseCount': pauseCount,
       'expectedDurationMinutes': expectedDurationMinutes,
       'actualDurationMinutes': actualDurationMinutes,
       'postponeCount': postponeCount,
@@ -125,6 +137,9 @@ class TaskModel {
       startedAt: task.startedAt,
       completedAt: task.completedAt,
       lastPostponedAt: task.lastPostponedAt,
+      pausedAt: task.pausedAt,
+      pausedDurationMinutes: task.pausedDuration.inMinutes,
+      pauseCount: task.pauseCount,
       expectedDurationMinutes: task.expectedDuration.inMinutes,
       actualDurationMinutes: task.actualDuration?.inMinutes,
       postponeCount: task.postponeCount,
@@ -146,6 +161,9 @@ class TaskModel {
     DateTime? startedAt,
     DateTime? completedAt,
     DateTime? lastPostponedAt,
+    DateTime? pausedAt,
+    int? pausedDurationMinutes,
+    int? pauseCount,
     int? expectedDurationMinutes,
     int? actualDurationMinutes,
     int? postponeCount,
@@ -165,6 +183,10 @@ class TaskModel {
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
       lastPostponedAt: lastPostponedAt ?? this.lastPostponedAt,
+      pausedAt: pausedAt ?? this.pausedAt,
+      pausedDurationMinutes:
+          pausedDurationMinutes ?? this.pausedDurationMinutes,
+      pauseCount: pauseCount ?? this.pauseCount,
       expectedDurationMinutes:
           expectedDurationMinutes ?? this.expectedDurationMinutes,
       actualDurationMinutes:

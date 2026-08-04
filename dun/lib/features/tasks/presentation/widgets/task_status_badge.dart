@@ -11,6 +11,7 @@ class TaskStatusBadge extends StatelessWidget {
     final (label, color) = switch (status) {
       TaskStatus.pending => ('En attente', Colors.orange),
       TaskStatus.inProgress => ('En cours', Colors.blue),
+      TaskStatus.paused => ('En pause', Colors.purple),
       TaskStatus.completed => ('Terminée', Colors.green),
       TaskStatus.cancelled => ('Annulée', Colors.red),
       TaskStatus.archived => ('Archivée', Colors.grey),
