@@ -22,6 +22,8 @@ class DashboardMetrics extends Equatable {
     required this.totalActualDurationMinutes,
     required this.remainingEstimatedDurationMinutes,
     required this.tasksByDay,
+    required this.upcomingTasks,
+    required this.mostUrgentTask,
   });
 
   /// Période pour laquelle les métriques ont été calculées.
@@ -57,6 +59,12 @@ class DashboardMetrics extends Equatable {
   /// Répartition des tâches par jour, orientée visualisation.
   final List<DailyMetric> tasksByDay;
 
+  /// Jusqu'à 5 prochaines tâches actives triées par date de planification.
+  final List<Task> upcomingTasks;
+
+  /// Tâche la plus urgente à accomplir, ou `null` si aucune tâche active.
+  final Task? mostUrgentTask;
+
   /// Métriques vides par défaut pour une période donnée.
   factory DashboardMetrics.empty(DashboardPeriod period) {
     return DashboardMetrics(
@@ -71,6 +79,8 @@ class DashboardMetrics extends Equatable {
       totalActualDurationMinutes: 0,
       remainingEstimatedDurationMinutes: 0,
       tasksByDay: const [],
+      upcomingTasks: const [],
+      mostUrgentTask: null,
     );
   }
 
@@ -122,6 +132,9 @@ class DashboardMetrics extends Equatable {
     final pendingTasks = totalTasks - completedTasks;
     final completionRate = totalTasks == 0 ? 0.0 : completedTasks / totalTasks;
     final tasksByDay = _buildTasksByDay(filtered, now);
+    final activeTasks = filtered.where(_isActive).toList();
+    final upcomingTasks = _buildUpcomingTasks(activeTasks);
+    final mostUrgentTask = _pickMostUrgentTask(activeTasks);
 
     return DashboardMetrics(
       period: period,
@@ -135,6 +148,8 @@ class DashboardMetrics extends Equatable {
       totalActualDurationMinutes: totalActualDurationMinutes,
       remainingEstimatedDurationMinutes: remainingEstimatedDurationMinutes,
       tasksByDay: tasksByDay,
+      upcomingTasks: upcomingTasks,
+      mostUrgentTask: mostUrgentTask,
     );
   }
 
@@ -217,5 +232,40 @@ class DashboardMetrics extends Equatable {
     totalActualDurationMinutes,
     remainingEstimatedDurationMinutes,
     tasksByDay,
+    upcomingTasks,
+    mostUrgentTask,
   ];
+
+  static bool _isActive(Task task) =>
+      !task.archived &&
+      task.status != TaskStatus.completed &&
+      task.status != TaskStatus.cancelled;
+
+  static List<Task> _buildUpcomingTasks(List<Task> activeTasks) {
+    final sorted = [...activeTasks]
+      ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+    return sorted.take(5).toList();
+  }
+
+  static Task? _pickMostUrgentTask(List<Task> activeTasks) {
+    if (activeTasks.isEmpty) return null;
+
+    final sorted = [...activeTasks]
+      ..sort((a, b) {
+        final aOverdue = a.isOverdue ? 1 : 0;
+        final bOverdue = b.isOverdue ? 1 : 0;
+
+        if (aOverdue != bOverdue) return bOverdue.compareTo(aOverdue);
+
+        final dateComparison = a.scheduledAt.compareTo(b.scheduledAt);
+        if (dateComparison != 0) return dateComparison;
+
+        final priorityComparison = b.priority.compareTo(a.priority);
+        if (priorityComparison != 0) return priorityComparison;
+
+        return a.createdAt.compareTo(b.createdAt);
+      });
+
+    return sorted.first;
+  }
 }
