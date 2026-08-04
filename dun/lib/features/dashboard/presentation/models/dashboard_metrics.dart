@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
 import '../../../tasks/domain/entities/task.dart';
 import '../../../tasks/domain/entities/task_status.dart';
+import 'daily_metric.dart';
 import 'dashboard_period.dart';
 
 /// Agrégat de métriques calculées à partir d'une liste de tâches pour une
@@ -19,6 +21,7 @@ class DashboardMetrics extends Equatable {
     required this.totalExpectedDurationMinutes,
     required this.totalActualDurationMinutes,
     required this.remainingEstimatedDurationMinutes,
+    required this.tasksByDay,
   });
 
   /// Période pour laquelle les métriques ont été calculées.
@@ -51,6 +54,9 @@ class DashboardMetrics extends Equatable {
   /// Durée estimée restante à accomplir dans la période.
   final int remainingEstimatedDurationMinutes;
 
+  /// Répartition des tâches par jour, orientée visualisation.
+  final List<DailyMetric> tasksByDay;
+
   /// Métriques vides par défaut pour une période donnée.
   factory DashboardMetrics.empty(DashboardPeriod period) {
     return DashboardMetrics(
@@ -64,6 +70,7 @@ class DashboardMetrics extends Equatable {
       totalExpectedDurationMinutes: 0,
       totalActualDurationMinutes: 0,
       remainingEstimatedDurationMinutes: 0,
+      tasksByDay: const [],
     );
   }
 
@@ -114,6 +121,7 @@ class DashboardMetrics extends Equatable {
     final totalTasks = filtered.length;
     final pendingTasks = totalTasks - completedTasks;
     final completionRate = totalTasks == 0 ? 0.0 : completedTasks / totalTasks;
+    final tasksByDay = _buildTasksByDay(filtered, now);
 
     return DashboardMetrics(
       period: period,
@@ -126,7 +134,42 @@ class DashboardMetrics extends Equatable {
       totalExpectedDurationMinutes: totalExpectedDurationMinutes,
       totalActualDurationMinutes: totalActualDurationMinutes,
       remainingEstimatedDurationMinutes: remainingEstimatedDurationMinutes,
+      tasksByDay: tasksByDay,
     );
+  }
+
+  static List<DailyMetric> _buildTasksByDay(List<Task> tasks, DateTime now) {
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final days = List.generate(
+      7,
+      (index) => DateTime(
+        startOfWeek.year,
+        startOfWeek.month,
+        startOfWeek.day + index,
+      ),
+    );
+
+    return days.map((day) {
+      final dayTasks = tasks.where(
+        (task) =>
+            task.scheduledAt.year == day.year &&
+            task.scheduledAt.month == day.month &&
+            task.scheduledAt.day == day.day,
+      );
+
+      final total = dayTasks.length;
+      final completed = dayTasks
+          .where((task) => task.status == TaskStatus.completed)
+          .length;
+
+      return DailyMetric(
+        day: day,
+        shortLabel: DateFormat.E('fr_FR').format(day).substring(0, 3),
+        fullLabel: DateFormat.yMMMMEEEEd('fr_FR').format(day),
+        total: total,
+        completed: completed,
+      );
+    }).toList();
   }
 
   static bool _isInPeriod({
@@ -173,5 +216,6 @@ class DashboardMetrics extends Equatable {
     totalExpectedDurationMinutes,
     totalActualDurationMinutes,
     remainingEstimatedDurationMinutes,
+    tasksByDay,
   ];
 }
