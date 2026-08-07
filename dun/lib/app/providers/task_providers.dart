@@ -11,6 +11,7 @@ import 'package:dun/features/tasks/domain/usecases/get_task_by_id.dart';
 import 'package:dun/features/tasks/domain/usecases/update_task.dart';
 import 'package:dun/features/tasks/domain/usecases/watch_task.dart';
 import 'package:dun/features/tasks/domain/usecases/watch_tasks.dart';
+import 'package:dun/features/tasks/domain/usecases/watch_pending_tasks.dart';
 import 'package:dun/features/tasks/domain/usecases/watch_tasks_by_period.dart';
 import 'package:dun/features/tasks/domain/usecases/watch_tasks_for_day.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,4 +61,8 @@ final deleteTaskProvider = Provider<DeleteTask>((ref) {
 
 final changeTaskStatusProvider = Provider<ChangeTaskStatus>((ref) {
   return ChangeTaskStatus(ref.read(taskRepositoryProvider));
+});
+
+final watchPendingTasksProvider = Provider<WatchPendingTasks>((ref) {
+  return WatchPendingTasks(ref.read(taskRepositoryProvider));
 });

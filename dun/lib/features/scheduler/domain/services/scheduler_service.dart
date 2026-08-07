@@ -3,43 +3,23 @@ import 'dart:async';
 import '../../../tasks/domain/entities/task.dart';
 import '../../../tasks/domain/entities/task_status.dart';
 import '../../../tasks/domain/usecases/watch_pending_tasks.dart';
-import '../../../tasks/presentation/controllers/execution_controller.dart';
 
-/// Horloge injectable utilisée par [SchedulerService] pour rester testable
-/// sans dépendre de `DateTime.now`.
 typedef Clock = DateTime Function();
 
-/// Service de scheduling pur déclenchant automatiquement le démarrage des
-/// tâches dont l'heure planifiée ([Task.scheduledAt]) est atteinte.
+/// Service de scheduling déclenchant les tâches dont l'heure planifiée est atteinte.
 ///
-/// Ce service ne dépend d'aucun widget, provider, controller de présentation
-/// générique ni accès direct à Firestore. Il réutilise exclusivement :
-/// - [WatchPendingTasks] pour observer les tâches en attente
-/// - [ExecutionController] pour déclencher l'exécution
-/// - [Clock] pour l'horloge injectable
-///
-/// Le service lance une vérification toutes les 15 secondes et s'assure
-/// qu'une tâche donnée n'est démarrée qu'une seule fois grâce à un
-/// [Set<String>] de `taskId` déjà déclenchés.
+/// Notifie via [onTaskDue] ; ne connaît aucun controller ni provider.
 class SchedulerService {
-  /// Crée un service de scheduling.
-  ///
-  /// [watchPendingTasks] est le use case exposant le flux des tâches en
-  /// attente. [executionControllerFactory] est une factory retournant une
-  /// instance d'[ExecutionController] prête à démarrer la tâche ciblée.
-  /// [clock] permet d'injecter une horloge de test ; par défaut
-  /// `DateTime.now`.
   SchedulerService({
     required WatchPendingTasks watchPendingTasks,
-    required ExecutionController Function(String taskId)
-    executionControllerFactory,
+    required Future<void> Function(Task task) onTaskDue,
     Clock? clock,
   }) : _watchPendingTasks = watchPendingTasks,
-       _executionControllerFactory = executionControllerFactory,
+       _onTaskDue = onTaskDue,
        _clock = clock ?? DateTime.now;
 
   final WatchPendingTasks _watchPendingTasks;
-  final ExecutionController Function(String taskId) _executionControllerFactory;
+  final Future<void> Function(Task task) _onTaskDue;
   final Clock _clock;
 
   static const _tickInterval = Duration(seconds: 15);
@@ -140,15 +120,8 @@ class SchedulerService {
 
   void _triggerTask(Task task) {
     _triggeredTaskIds.add(task.id);
-
-    // La factory fournit un controller déjà configuré pour le taskId.
-    final controller = _executionControllerFactory(task.id);
-
-    // Le démarrage est asynchrone ; les erreurs sont capturées pour ne pas
-    // faire tomber le scheduler.
-    controller.start().catchError((Object error) {
-      // En cas d'échec, on retire l'identifiant pour permettre une nouvelle
-      // tentative au prochain tick.
+    _onTaskDue(task).catchError((Object error) {
+      // Retire l'id pour permettre une nouvelle tentative au prochain tick.
       _triggeredTaskIds.remove(task.id);
     });
   }
