@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dun/features/auth/domain/entities/app_user.dart';
 
 class UserModel {
@@ -24,8 +24,23 @@ class UserModel {
       displayName: json['displayName'] as String?,
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       updatedAt: (json['updatedAt'] as Timestamp).toDate(),
-      onboardingCompleted: json['onboardingCompleted'] as bool? ?? false,
-      preferredTheme: json['preferredTheme'] as String? ?? 'system',
+      onboardingCompleted:
+          json['onboardingCompleted'] as bool? ?? false,
+      preferredTheme:
+          json['preferredTheme'] as String? ?? 'system',
+    );
+  }
+
+  factory UserModel.fromSupabase(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] as String,
+      displayName: json['display_name'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      onboardingCompleted:
+          json['onboarding_completed'] as bool? ?? false,
+      preferredTheme:
+          json['preferred_theme'] as String? ?? 'system',
     );
   }
 

@@ -12,6 +12,7 @@ class EnvConfig {
         : kProfileMode
         ? '.env.staging'
         : '.env.dev';
+
     await dotenv.load(fileName: fileName);
   }
 
@@ -23,4 +24,10 @@ class EnvConfig {
     final env = get('ENV', fallback: 'dev');
     return Environment.values.byName(env);
   }
+
+  /// URL du projet Supabase courant.
+  static String get supabaseUrl => get('SUPABASE_URL');
+
+  /// Clé publique destinée à l'application cliente.
+  static String get supabasePublishableKey => get('SUPABASE_PUBLISHABLE_KEY');
 }
