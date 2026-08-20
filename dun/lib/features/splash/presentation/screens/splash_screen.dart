@@ -1,4 +1,8 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:async';
+
+import 'package:dun/app/router/router_paths.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,11 +22,12 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _brandOpacity;
   late final Animation<Offset> _brandSlide;
 
+  Timer? _navigationTimer;
+
   @override
   void initState() {
     super.initState();
 
-    // Animation du logo principal.
     _logoController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -30,11 +35,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _logoOpacity = CurvedAnimation(
       parent: _logoController,
-      curve: const Interval(
-        0.0,
-        0.65,
-        curve: Curves.easeOut,
-      ),
+      curve: Curves.easeOut,
     );
 
     _logoScale = Tween<double>(
@@ -47,7 +48,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Animation du logo + slogan.
     _brandController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -89,10 +89,29 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     await _brandController.forward();
+
+    if (!mounted) return;
+
+    // Le Splash est terminé.
+    // On passe par /auth comme point de sortie.
+    //
+    // Le redirect de GoRouter décide ensuite :
+    // - utilisateur non connecté -> /auth
+    // - utilisateur connecté sans PIN -> /pin-setup
+    // - utilisateur connecté avec PIN -> /pin-login
+    _navigationTimer = Timer(
+      const Duration(milliseconds: 700),
+      () {
+        if (!mounted) return;
+
+        context.go(RouterPaths.auth);
+      },
+    );
   }
 
   @override
   void dispose() {
+    _navigationTimer?.cancel();
     _logoController.dispose();
     _brandController.dispose();
     super.dispose();
@@ -148,9 +167,6 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // -------------------------------------------------
-                    // LOGO PRINCIPAL
-                    // -------------------------------------------------
                     FadeTransition(
                       opacity: _logoOpacity,
                       child: ScaleTransition(
@@ -167,9 +183,6 @@ class _SplashScreenState extends State<SplashScreen>
                       height: shortestSide * 0.035,
                     ),
 
-                    // -------------------------------------------------
-                    // LOGO + SLOGAN
-                    // -------------------------------------------------
                     FadeTransition(
                       opacity: _brandOpacity,
                       child: SlideTransition(
