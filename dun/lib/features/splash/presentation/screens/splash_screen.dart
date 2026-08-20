@@ -16,27 +16,39 @@ class SplashScreen extends StatelessWidget {
             colors: [
               Color(0xFF5B16FF),
               Color(0xFF712DFF),
-              Color(0xFF8D55F5),
-              Color(0xFFB582F3),
+              Color(0xFF9658F5),
+              Color(0xFFB982F0),
             ],
-            stops: [0.0, 0.38, 0.72, 1.0],
+            stops: [
+              0.0,
+              0.38,
+              0.72,
+              1.0,
+            ],
           ),
         ),
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final shortestSide = constraints.biggest.shortestSide;
+              final shortestSide =
+                  constraints.biggest.shortestSide;
 
-              // Grand logo
+              // Logo principal.
               final logoWidth = (shortestSide * 0.48).clamp(
                 150.0,
                 230.0,
               );
 
-              // Logo + slogan : volontairement plus petit
-              final brandWidth = (shortestSide * 0.38).clamp(
-                130.0,
-                200.0,
+              // Logo-2 plus petit pour limiter le flou.
+              final brandWidth = (shortestSide * 0.25).clamp(
+                90.0,
+                125.0,
+              );
+
+              final taglineFontSize =
+                  (shortestSide * 0.035).clamp(
+                12.0,
+                15.0,
               );
 
               return Center(
@@ -50,30 +62,29 @@ class SplashScreen extends StatelessWidget {
                     ),
 
                     SizedBox(
-                      height: shortestSide * 0.045,
+                      height: shortestSide * 0.035,
                     ),
 
-                    // Image 2 réduite
-                    SizedBox(
+                    Image.asset(
+                      'assets/images/Logo-2.png',
                       width: brandWidth,
-                      height: 50,
-                      child: Image.asset(
-                        'assets/images/Logo-2.png',
-                        fit: BoxFit.contain,
-                      ),
+                      fit: BoxFit.contain,
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                      ),
                       child: Text(
-                        'Organisez votre vie, une tâche à la fois.',
+                        'Organistion - Education - Planification',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: taglineFontSize,
                           fontWeight: FontWeight.w400,
+                          letterSpacing: 0.1,
                         ),
                       ),
                     ),

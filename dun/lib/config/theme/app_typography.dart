@@ -1,50 +1,44 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTypography {
   const AppTypography._();
 
-  static const String fontFamily = 'Outfit';
-
   static TextTheme textTheme(Color textColor) {
-    return TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: fontFamily,
+    final base = GoogleFonts.poppinsTextTheme();
+
+    return base.copyWith(
+      displayLarge: base.displayLarge?.copyWith(
         fontWeight: FontWeight.w700,
         fontSize: 40,
         color: textColor,
       ),
-      headlineMedium: TextStyle(
-        fontFamily: fontFamily,
+      headlineMedium: base.headlineMedium?.copyWith(
         fontWeight: FontWeight.w700,
         fontSize: 28,
         color: textColor,
       ),
-      titleLarge: TextStyle(
-        fontFamily: fontFamily,
+      titleLarge: base.titleLarge?.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 20,
         color: textColor,
       ),
-      titleMedium: TextStyle(
-        fontFamily: fontFamily,
+      titleMedium: base.titleMedium?.copyWith(
         fontWeight: FontWeight.w500,
         fontSize: 16,
         color: textColor,
       ),
-      bodyLarge: TextStyle(
-        fontFamily: fontFamily,
+      bodyLarge: base.bodyLarge?.copyWith(
         fontWeight: FontWeight.w400,
         fontSize: 16,
         color: textColor,
       ),
-      bodyMedium: TextStyle(
-        fontFamily: fontFamily,
+      bodyMedium: base.bodyMedium?.copyWith(
         fontWeight: FontWeight.w400,
         fontSize: 14,
         color: textColor,
       ),
-      labelLarge: TextStyle(
-        fontFamily: fontFamily,
+      labelLarge: base.labelLarge?.copyWith(
         fontWeight: FontWeight.w600,
         fontSize: 14,
         color: textColor,
